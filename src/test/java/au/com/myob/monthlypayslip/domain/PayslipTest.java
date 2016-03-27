@@ -4,27 +4,21 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
 public class PayslipTest {
 	
-	@Test
-	public void shouldCalculateGrossIncome() {
+	@Test(dataProvider = "completeCalculation")
+	public void shouldCalculate(Integer annualSalary, Integer expectedGrossIncome, Integer expectedIncomeTax, Integer expectedNetIncome) {
 
-		Payslip payslip = buildPayslip();
+		Payslip payslip = new Payslip();
+		payslip.setAnnualSalary(annualSalary);
 		payslip.calculate();
-		assertNotNull(payslip.getGrossIncome());
+		assertEquals(payslip.getGrossIncome(), expectedGrossIncome);
+		assertEquals(payslip.getIncomeTax(), expectedIncomeTax);
+		assertEquals(payslip.getNetIncome(), expectedNetIncome);
 	}
-	
-	@Test
-	public void shouldCalculateIncomeTax() {
-
-		Payslip payslip = buildPayslip();
-		payslip.calculate();
-		assertNotNull(payslip.getIncomeTax());
-	}
-	
-	@Test(dataProvider = "grossCalculation")
+		
+	@Test(dataProvider = "grossIncomeCalculation")
 	public void shouldCalculateGrossIncomeCorrectly(Integer annualSalary, Integer expectedGrossIncome) {
 
 		Payslip payslip = new Payslip();
@@ -43,13 +37,32 @@ public class PayslipTest {
 
 		assertEquals(calculatedIncomeTax, expectedIncomeTax);
 	}
+	
+	@Test(dataProvider = "netIncomeCalculation")
+	public void shouldCalculateNetIncomeCorrectly(Integer annualSalary, Integer expectedNetIncome) {
+
+		Payslip payslip = new Payslip();
+		payslip.setAnnualSalary(annualSalary);
+		Integer calculatedIncomeTax = payslip.calculateNetIncome();
+
+		assertEquals(calculatedIncomeTax, expectedNetIncome);
+	}
 
 	/**
 	 * Data providers
 	 */
 	
-	@DataProvider(name = "grossCalculation")
-	public Object[][] provideGross() {
+	@DataProvider(name = "completeCalculation")
+	public Object[][] provideComplete() {
+		return new Object[][] {
+			{ Integer.valueOf(1200), Integer.valueOf(100), Integer.valueOf(0), Integer.valueOf(100) },  
+			{ Integer.valueOf(60050), Integer.valueOf(5004), Integer.valueOf(922), Integer.valueOf(4082) },
+			{ Integer.valueOf(120000), Integer.valueOf(10000), Integer.valueOf(2696), Integer.valueOf(7304) },
+		};		
+	}
+	
+	@DataProvider(name = "grossIncomeCalculation")
+	public Object[][] provideGrossIncome() {
 		return new Object[][] {
 			{ Integer.valueOf(120000), Integer.valueOf(10000) }, // 10,000
 			{ Integer.valueOf(60050), Integer.valueOf(5004) }, // 5,004.1666
@@ -63,20 +76,17 @@ public class PayslipTest {
 		return new Object[][] {
 			{ Integer.valueOf(100), Integer.valueOf(0) },  
 			{ Integer.valueOf(60050), Integer.valueOf(922) },
+			{ Integer.valueOf(120000), Integer.valueOf(2696) },
 			{ Integer.valueOf(180000), Integer.valueOf(4546) },
 		};		
 	}
 	
-	/**
-	 * Builders
-	 */
-	private static Payslip buildPayslip() {
-		Payslip p = new Payslip();
-		p.setFirstName("David");
-		p.setLastName("Rudd");
-		p.setAnnualSalary(60000);
-		p.setSuperRate("9%");
-		p.setDate("01 March – 31 March");
-		return p;
+	@DataProvider(name = "netIncomeCalculation")
+	public Object[][] provideNetIncome() {
+		return new Object[][] {
+			{ Integer.valueOf(1200), Integer.valueOf(100) },  
+			{ Integer.valueOf(60050), Integer.valueOf(4082) },
+			{ Integer.valueOf(120000), Integer.valueOf(7304) },
+		};		
 	}
 }

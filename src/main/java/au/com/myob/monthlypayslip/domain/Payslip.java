@@ -15,6 +15,8 @@ public class Payslip {
 	private Integer grossIncome;
 
 	private Integer incomeTax;
+
+	private Integer netIncome;
 	
 	public String getFirstName() {
 		return firstName;
@@ -72,9 +74,18 @@ public class Payslip {
 		this.incomeTax = incomeTax;
 	}
 
+	public Integer getNetIncome() {
+		return netIncome;
+	}
+
+	public void setNetIncome(Integer netIncome) {
+		this.netIncome = netIncome;
+	}
+
 	public void calculate() {
 		this.grossIncome = calculateGrossIncome();
 		this.incomeTax = calculateIncomeTax();
+		this.netIncome = calculateNetIncome();
 		
 	}
 
@@ -87,6 +98,14 @@ public class Payslip {
 
 		Tax tax = TaxTable.getInstance().filterByAnnualSalary(this.annualSalary);
 		return (tax == null) ? 0 : Math.round((tax.getStart() + (annualSalary - tax.getOver()) * tax.getMultiple()) / 12f);
+	}
+	
+	Integer calculateNetIncome() {
+		
+		if (this.grossIncome == null) this.grossIncome = this.calculateGrossIncome();
+		if (this.incomeTax == null) this.incomeTax = this.calculateIncomeTax();
+		
+		return this.grossIncome - this.incomeTax;
 	}
 
 	@Override
