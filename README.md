@@ -11,6 +11,7 @@ mvn clean package && java -jar target/MontlypaySlip.jar <CSV_INPUT_FILE>
 - Maven
 - TestNG (unit test)
 - Mockito (mocks)
+- OpenCSV
 
 ## Assumptions
 - CSV (input and output) has no header
