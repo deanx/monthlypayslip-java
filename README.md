@@ -4,5 +4,4 @@
 mvn clean test
 
 ## Running project
-mvn clean package
-java -jar target/montlypayslip-0.0.1-SNAPSHOT.jar
+mvn clean package && java -jar target/MontlypaySlip.jar <CSV_INPUT_FILE>
