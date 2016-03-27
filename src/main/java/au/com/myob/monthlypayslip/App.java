@@ -34,7 +34,7 @@ public class App {
 		try {
 
 			List<Payslip> payslips = payslipCSV.read(args[0]);
-			payslips.forEach(p -> {p.calculate();System.out.println(p);});
+			payslips.forEach(p -> p.calculate());
 			payslipCSV.write(payslips, OUTPUT_CSV_FILENAME);
 		
 		} catch (FileNotFoundException e) {

@@ -11,6 +11,8 @@ public class Payslip {
 	private String superRate;
 	
 	private String date;
+
+	private Integer grossIncome;
 	
 	public String getFirstName() {
 		return firstName;
@@ -52,9 +54,22 @@ public class Payslip {
 		this.date = date;
 	}
 
+	public Integer getGrossIncome() {
+		return grossIncome;
+	}
+
+	public void setGrossIncome(Integer grossIncome) {
+		this.grossIncome = grossIncome;
+	}
+
 	public void calculate() {
-		// TODO Auto-generated method stub
+		this.grossIncome = calculateGrossIncome();
 		
+	}
+
+	Integer calculateGrossIncome() {
+
+		return Math.round(this.annualSalary / 12f);
 	}
 
 	@Override
