@@ -7,7 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import au.com.myob.monthlypayslip.domain.Payslip;
 import au.com.myob.monthlypayslip.domain.PayslipCSV;
-import au.com.myob.monthlypayslip.exception.FileUnparsableException;
+import au.com.myob.monthlypayslip.exception.FileParseException;
+import au.com.myob.monthlypayslip.exception.FileWriteException;
 
 /**
  * Hello world!
@@ -41,9 +42,13 @@ public class App {
 			
 			return "File " + args[0] + " not found";
 			
-		} catch (FileUnparsableException e2) {
+		} catch (FileParseException e2) {
 			
 			return "Could not parse file " + args[0];
+			
+		} catch (FileWriteException e2) {
+			
+			return "Could not write output file " + OUTPUT_CSV_FILENAME;
 		}
 			
 		return OUTPUT_CSV_FILENAME + " file generated";
