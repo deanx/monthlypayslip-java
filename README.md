@@ -4,7 +4,7 @@
 mvn clean test
 
 ## Running project
-mvn clean package && java -jar target/MontlypaySlip.jar <CSV_INPUT_FILE>
+mvn clean package && java -jar target/MontlypaySlip.jar [CSV_INPUT_FILE]
 
 ## Technologies
 - Java 8
