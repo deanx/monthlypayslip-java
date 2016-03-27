@@ -1,5 +1,7 @@
 package au.com.myob.monthlypayslip.domain;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Payslip {
 
 	private String firstName;
@@ -17,6 +19,8 @@ public class Payslip {
 	private Integer incomeTax;
 
 	private Integer netIncome;
+	
+	private Integer superTotal;
 	
 	public String getFirstName() {
 		return firstName;
@@ -82,10 +86,25 @@ public class Payslip {
 		this.netIncome = netIncome;
 	}
 
+	
+	public Integer getSuperTotal() {
+		return superTotal;
+	}
+
+	public void setSuperTotal(Integer superTotal) {
+		this.superTotal = superTotal;
+	}
+
+	public Float getSuperRateAsDecimal() {
+		String stringSuperRate = StringUtils.substringBefore(this.superRate, "%");
+		return StringUtils.isEmpty(stringSuperRate) ? 0f : Integer.valueOf(stringSuperRate) / 100f;
+	}
+	
 	public void calculate() {
 		this.grossIncome = calculateGrossIncome();
 		this.incomeTax = calculateIncomeTax();
 		this.netIncome = calculateNetIncome();
+		this.superTotal = calculateSuper();
 		
 	}
 
@@ -106,6 +125,13 @@ public class Payslip {
 		if (this.incomeTax == null) this.incomeTax = this.calculateIncomeTax();
 		
 		return this.grossIncome - this.incomeTax;
+	}
+	
+	Integer calculateSuper() {
+		
+		if (this.grossIncome == null) this.grossIncome = this.calculateGrossIncome();
+
+		return Math.round(this.grossIncome * getSuperRateAsDecimal());
 	}
 
 	@Override

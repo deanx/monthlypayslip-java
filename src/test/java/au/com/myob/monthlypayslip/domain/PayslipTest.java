@@ -7,15 +7,26 @@ import static org.testng.Assert.assertEquals;
 
 public class PayslipTest {
 	
+	@Test(dataProvider = "superAsDecimal")
+	public void shouldConvertSuperToDecimal(String superRate, Float expectedDecimalSuper) {
+
+		Payslip payslip = new Payslip();
+		payslip.setSuperRate(superRate);
+		Float calculatedDecimalSuper = payslip.getSuperRateAsDecimal();
+		assertEquals(calculatedDecimalSuper, expectedDecimalSuper);
+	}
+	
 	@Test(dataProvider = "completeCalculation")
-	public void shouldCalculate(Integer annualSalary, Integer expectedGrossIncome, Integer expectedIncomeTax, Integer expectedNetIncome) {
+	public void shouldCalculate(Integer annualSalary, String superRate, Integer expectedGrossIncome, Integer expectedIncomeTax, Integer expectedNetIncome, Integer expecetedSuper) {
 
 		Payslip payslip = new Payslip();
 		payslip.setAnnualSalary(annualSalary);
+		payslip.setSuperRate(superRate);
 		payslip.calculate();
 		assertEquals(payslip.getGrossIncome(), expectedGrossIncome);
 		assertEquals(payslip.getIncomeTax(), expectedIncomeTax);
 		assertEquals(payslip.getNetIncome(), expectedNetIncome);
+		assertEquals(payslip.getSuperTotal(), expecetedSuper);
 	}
 		
 	@Test(dataProvider = "grossIncomeCalculation")
@@ -47,17 +58,37 @@ public class PayslipTest {
 
 		assertEquals(calculatedIncomeTax, expectedNetIncome);
 	}
+	
+	@Test(dataProvider = "superCalculation")
+	public void shouldCalculateSuperCorrectly(Integer annualSalary, String superRate, Integer expectedSuper) {
+
+		Payslip payslip = new Payslip();
+		payslip.setAnnualSalary(annualSalary);
+		payslip.setSuperRate(superRate);
+		Integer calculatedSuper = payslip.calculateSuper();
+
+		assertEquals(calculatedSuper, expectedSuper);
+	}
 
 	/**
 	 * Data providers
 	 */
 	
+	@DataProvider(name = "superAsDecimal")
+	public Object[][] provideSuperRate() {
+		return new Object[][] {
+			{ "9%", Float.valueOf(0.09f) },  
+			{ "34%", Float.valueOf(0.34f) },  
+			{ "50%", Float.valueOf(0.50f) },    
+		};		
+	}
+	
 	@DataProvider(name = "completeCalculation")
 	public Object[][] provideComplete() {
 		return new Object[][] {
-			{ Integer.valueOf(1200), Integer.valueOf(100), Integer.valueOf(0), Integer.valueOf(100) },  
-			{ Integer.valueOf(60050), Integer.valueOf(5004), Integer.valueOf(922), Integer.valueOf(4082) },
-			{ Integer.valueOf(120000), Integer.valueOf(10000), Integer.valueOf(2696), Integer.valueOf(7304) },
+			{ Integer.valueOf(1200), "1%", Integer.valueOf(100), Integer.valueOf(0), Integer.valueOf(100), Integer.valueOf(1) },  
+			{ Integer.valueOf(60050), "9%", Integer.valueOf(5004), Integer.valueOf(922), Integer.valueOf(4082), Integer.valueOf(450) },
+			{ Integer.valueOf(120000), "10%", Integer.valueOf(10000), Integer.valueOf(2696), Integer.valueOf(7304), Integer.valueOf(1000) },
 		};		
 	}
 	
@@ -87,6 +118,14 @@ public class PayslipTest {
 			{ Integer.valueOf(1200), Integer.valueOf(100) },  
 			{ Integer.valueOf(60050), Integer.valueOf(4082) },
 			{ Integer.valueOf(120000), Integer.valueOf(7304) },
+		};		
+	}
+	
+	@DataProvider(name = "superCalculation")
+	public Object[][] provideSuper() {
+		return new Object[][] {
+			{ Integer.valueOf(60050), "9%", Integer.valueOf(450) },  
+			{ Integer.valueOf(120000), "10%", Integer.valueOf(1000) },
 		};		
 	}
 }
