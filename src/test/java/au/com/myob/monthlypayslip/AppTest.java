@@ -1,5 +1,11 @@
 package au.com.myob.monthlypayslip;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -12,13 +18,10 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
 
 import au.com.myob.monthlypayslip.domain.Payslip;
 import au.com.myob.monthlypayslip.domain.PayslipCSV;
+import au.com.myob.monthlypayslip.exception.FileUnparsableException;
 
 /**
  * Unit test for simple App.
@@ -42,7 +45,7 @@ public class AppTest {
 	}
 
 	@Test(dataProvider = "failedInputs")
-	public void shouldReturnUsageMessage(String[] args) throws IOException {
+	public void shouldReturnUsageMessage(String[] args) throws IOException, FileUnparsableException {
 
 		String response = app.execute(args);
 		assertEquals(response, "Usage: java -jar MontlypaySlip.jar <CSV_INPUT_FILE>");
@@ -54,18 +57,39 @@ public class AppTest {
 		
 		String response = app.execute(new String[]{ "MyInputCSV.csv" });
 		assertEquals(response, App.OUTPUT_CSV_FILENAME + " file generated");
-		verify(payslipCSV, times(1)).read("MyInputCSV.csv");
 	}
 	
 	@Test
-	public void shouldReadCsv() throws IOException {
+	public void shouldReadCsv() throws IOException, FileUnparsableException {
 		
 		app.execute(new String[]{ "MyInputCSV.csv" });
 		verify(payslipCSV, times(1)).read("MyInputCSV.csv");
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
-	public void shouldCalculateEachPayslip() throws IOException {
+	public void shouldReturnMessageWhenFileNotFound() throws IOException, FileUnparsableException {
+		
+		when(payslipCSV.read("MyInputCSV-notfound.csv")).thenThrow(FileNotFoundException.class);
+		
+		String response = app.execute(new String[]{ "MyInputCSV-notfound.csv" });
+		assertEquals(response, "File MyInputCSV-notfound.csv not found");
+	
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void shouldReturnMessageWhenFileInvalid() throws IOException, FileUnparsableException {
+		
+		when(payslipCSV.read("MyInputCSV-invalid.csv")).thenThrow(FileUnparsableException.class);
+		
+		String response = app.execute(new String[]{ "MyInputCSV-invalid.csv" });
+		assertEquals(response, "Could not parse file MyInputCSV-invalid.csv");
+	
+	}
+	
+	@Test
+	public void shouldCalculateEachPayslip() throws IOException, FileUnparsableException {
 		
 		List<Payslip> payslips = Arrays.asList(PAYSLIP1, PAYSLIP2);
 		when(payslipCSV.read("MyInputCSV.csv")).thenReturn(payslips);
@@ -76,7 +100,7 @@ public class AppTest {
 	}
 	
 	@Test
-	public void shouldWriteCsv() throws IOException {
+	public void shouldWriteCsv() throws IOException, FileUnparsableException {
 		
 		List<Payslip> payslips = Arrays.asList(PAYSLIP1, PAYSLIP2);
 		when(payslipCSV.read("MyInputCSV.csv")).thenReturn(payslips);

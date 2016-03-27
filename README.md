@@ -11,4 +11,8 @@ mvn clean package && java -jar target/MontlypaySlip.jar <CSV_INPUT_FILE>
 - Maven
 - TestNG (unit test)
 - Mockito (mocks)
+
+## Assumptions
+- CSV (input and output) has no header
+- Super rate is positive integer
  
